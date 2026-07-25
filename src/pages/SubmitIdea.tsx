@@ -43,7 +43,7 @@ export const SubmitIdea: React.FC = () => {
           formData.difficulty
         );
         // Navigate to results page with the full structured JSON result
-        navigate('/results', { state: { projectData: result, idea: formData.title } });
+        navigate('/results', { state: { projectData: result, idea: formData.title, domain: formData.domain, difficulty: formData.difficulty } });
       } catch (error) {
         if (error instanceof Error) {
           setApiError(error.message);

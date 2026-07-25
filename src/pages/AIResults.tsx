@@ -11,6 +11,8 @@ export const AIResults: React.FC = () => {
   const location = useLocation();
   const ideaTitle = location.state?.idea || 'AI-Powered Crop Health Monitor';
   const realData = location.state?.projectData as ProjectData | undefined;
+  const domain = location.state?.domain || 'Unknown Domain';
+  const difficulty = location.state?.difficulty || 'Unknown Difficulty';
 
   // If realData is passed from SubmitIdea, skip loading simulation
   const [isLoading, setIsLoading] = useState(!realData);
@@ -54,7 +56,7 @@ export const AIResults: React.FC = () => {
                 {isLoading ? (
                     <Skeleton className="h-6 w-64" />
                 ) : (
-                    <p className="text-gray-400 text-lg">Domain: Agriculture • Difficulty: Intermediate</p>
+                    <p className="text-gray-400 text-lg">Domain: {domain} • Difficulty: {difficulty}</p>
                 )}
             </div>
             <div className="relative z-10">
@@ -79,15 +81,15 @@ export const AIResults: React.FC = () => {
                     </div>
                 ) : (
                     <div className="prose prose-invert max-w-none text-gray-300">
-                        <p>The problem of crop disease detection is highly validated. According to the FAO, up to 40% of global crop production is lost to pests annually. Current drone-based solutions are prohibitively expensive for smallholder farmers, and internet connectivity in rural areas prevents reliance on cloud-based AI inference.</p>
-                        <p className="mt-4 font-semibold text-emerald-400">Verdict: Strong Market Need</p>
+                        <p>{realData?.problemValidation || 'Problem validation data missing.'}</p>
+                        <p className="mt-4 font-semibold text-emerald-400">Market Need: {realData?.marketNeed || 'Not specified'}</p>
                     </div>
                 )}
             </section>
 
             {/* Research Summary */}
             <section className="bg-dark-800/50 rounded-2xl p-8 border border-dark-700 backdrop-blur-sm">
-                <SectionHeader icon={<Search />} title="Research Summary" />
+                <SectionHeader icon={<Search />} title="Research Papers" />
                 {isLoading ? (
                     <div className="space-y-3">
                         <Skeleton className="h-4 w-full" />
@@ -98,10 +100,13 @@ export const AIResults: React.FC = () => {
                     </div>
                 ) : (
                     <div className="prose prose-invert max-w-none text-gray-300">
-                        <p>Recent studies (2023-2025) indicate a shift towards edge computing in precision agriculture. Lightweight models like YOLOv8n can run efficiently on devices like Raspberry Pi or Jetson Nano attached directly to commercial drones, eliminating the need for cloud uploads.</p>
                         <ul className="list-disc pl-5 mt-4 space-y-2 text-gray-400">
-                            <li>Multispectral imaging improves early detection by 30%</li>
-                            <li>Offline inference reduces power consumption</li>
+                            {realData?.researchPapers?.map((paper, i) => (
+                                <li key={i}>{paper}</li>
+                            ))}
+                            {(!realData?.researchPapers || realData.researchPapers.length === 0) && (
+                                <li>No recent research papers found.</li>
+                            )}
                         </ul>
                     </div>
                 )}
@@ -122,15 +127,18 @@ export const AIResults: React.FC = () => {
                         <div>
                             <h3 className="text-white font-semibold mb-2">Existing Solutions</h3>
                             <div className="flex flex-wrap gap-2">
-                                <span className="px-3 py-1 bg-dark-700 rounded-md text-sm text-gray-300">FarmBot</span>
-                                <span className="px-3 py-1 bg-dark-700 rounded-md text-sm text-gray-300">DJI Agras</span>
-                                <span className="px-3 py-1 bg-dark-700 rounded-md text-sm text-gray-300">Sentera</span>
+                                {realData?.existingSolutions?.map((sol, i) => (
+                                    <span key={i} className="px-3 py-1 bg-dark-700 rounded-md text-sm text-gray-300">{sol}</span>
+                                ))}
+                                {(!realData?.existingSolutions || realData.existingSolutions.length === 0) && (
+                                    <span className="text-gray-500 italic text-sm">None identified</span>
+                                )}
                             </div>
                         </div>
                         <div>
                             <h3 className="text-white font-semibold mb-2">The Gap</h3>
                             <p className="text-gray-400 bg-dark-900/50 p-4 rounded-lg border border-red-900/30 border-l-2 border-l-red-500">
-                                Existing platforms are closed-ecosystem, require expensive proprietary hardware, and rely heavily on continuous 5G/4G connectivity which is unavailable in 70% of developing nation farmlands.
+                                {realData?.researchGap || 'No significant research gap identified.'}
                             </p>
                         </div>
                     </div>
@@ -147,20 +155,14 @@ export const AIResults: React.FC = () => {
                     </div>
                 ) : (
                     <div className="space-y-4">
-                        <div className="p-4 bg-primary-900/10 border border-primary-500/20 rounded-xl flex gap-4 items-start">
-                            <div className="w-8 h-8 rounded-full bg-primary-500/20 flex items-center justify-center text-primary-400 shrink-0">1</div>
-                            <div>
-                                <h4 className="text-white font-semibold mb-1">Open-Source Edge AI Payload</h4>
-                                <p className="text-sm text-gray-400">Design a universal 3D-printed mount with a Raspberry Pi that can attach to any cheap consumer drone (like DJI Mini) for offline inference.</p>
+                        {realData?.innovationOpportunities?.map((opp, i) => (
+                            <div key={i} className="p-4 bg-primary-900/10 border border-primary-500/20 rounded-xl flex gap-4 items-start">
+                                <div className="w-8 h-8 rounded-full bg-primary-500/20 flex items-center justify-center text-primary-400 shrink-0">{i + 1}</div>
+                                <div>
+                                    <p className="text-sm text-gray-400">{opp}</p>
+                                </div>
                             </div>
-                        </div>
-                        <div className="p-4 bg-purple-900/10 border border-purple-500/20 rounded-xl flex gap-4 items-start">
-                            <div className="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400 shrink-0">2</div>
-                            <div>
-                                <h4 className="text-white font-semibold mb-1">Federated Learning Sync</h4>
-                                <p className="text-sm text-gray-400">Drones sync their localized learnings with a central hub via LoRaWAN or when they return to a Wi-Fi zone, improving the global model without sending heavy image data.</p>
-                            </div>
-                        </div>
+                        ))}
                     </div>
                 )}
             </section>
@@ -182,11 +184,9 @@ export const AIResults: React.FC = () => {
                         </div>
                     ) : (
                         <div className="flex flex-wrap gap-2">
-                            <span className="px-4 py-1.5 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-full text-sm font-medium">React Native</span>
-                            <span className="px-4 py-1.5 bg-green-500/10 text-green-400 border border-green-500/20 rounded-full text-sm font-medium">FastAPI</span>
-                            <span className="px-4 py-1.5 bg-yellow-500/10 text-yellow-400 border border-yellow-500/20 rounded-full text-sm font-medium">Python</span>
-                            <span className="px-4 py-1.5 bg-orange-500/10 text-orange-400 border border-orange-500/20 rounded-full text-sm font-medium">YOLOv8</span>
-                            <span className="px-4 py-1.5 bg-sky-500/10 text-sky-400 border border-sky-500/20 rounded-full text-sm font-medium">Docker</span>
+                            {realData?.recommendedTechnologyStack?.map((tech, i) => (
+                                <span key={i} className="px-4 py-1.5 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-full text-sm font-medium">{tech}</span>
+                            ))}
                         </div>
                     )}
                 </div>
@@ -195,10 +195,10 @@ export const AIResults: React.FC = () => {
                     {isLoading ? (
                         <Skeleton className="h-64 w-full rounded-xl" />
                     ) : (
-                        <div className="w-full bg-dark-900/50 border border-dark-700 rounded-xl p-6 relative overflow-hidden group flex justify-center">
-                            {/* Abstract placeholder for architecture diagram */}
+                        <div className="w-full bg-dark-900/50 border border-dark-700 rounded-xl p-6 relative overflow-hidden group flex flex-col justify-center">
                             <div className="absolute inset-0 opacity-20 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary-900 via-dark-900 to-dark-900"></div>
-                            <Architecture />
+                            <div className="flex justify-center w-full mb-4 z-10"><Architecture /></div>
+                            <p className="mt-4 text-sm text-gray-400 text-center relative z-10 max-w-lg mx-auto">{realData?.systemArchitecture || 'Architecture details pending.'}</p>
                         </div>
                     )}
                 </div>
@@ -216,14 +216,11 @@ export const AIResults: React.FC = () => {
                     </div>
                 ) : (
                     <div className="space-y-3">
-                        <div className="p-3 bg-dark-900/50 border border-dark-700 rounded-lg">
-                            <p className="text-white font-medium text-sm">PlantVillage Dataset</p>
-                            <p className="text-xs text-gray-400">54,306 images of plant leaves</p>
-                        </div>
-                        <div className="p-3 bg-dark-900/50 border border-dark-700 rounded-lg">
-                            <p className="text-white font-medium text-sm">CGIAR Crop Disease</p>
-                            <p className="text-xs text-gray-400">African field imagery datasets</p>
-                        </div>
+                        {realData?.datasets?.map((dataset, i) => (
+                            <div key={i} className="p-3 bg-dark-900/50 border border-dark-700 rounded-lg">
+                                <p className="text-sm text-gray-300">{dataset}</p>
+                            </div>
+                        ))}
                     </div>
                 )}
             </section>
@@ -236,14 +233,11 @@ export const AIResults: React.FC = () => {
                     </div>
                 ) : (
                     <div className="space-y-3">
-                        <div className="p-3 bg-dark-900/50 border border-dark-700 rounded-lg">
-                            <p className="text-white font-medium text-sm">OpenWeather API</p>
-                            <p className="text-xs text-gray-400">Correlate weather with disease spread</p>
-                        </div>
-                        <div className="p-3 bg-dark-900/50 border border-dark-700 rounded-lg">
-                            <p className="text-white font-medium text-sm">Twilio API</p>
-                            <p className="text-xs text-gray-400">SMS alerts for offline farmers</p>
-                        </div>
+                        {realData?.apis?.map((api, i) => (
+                            <div key={i} className="p-3 bg-dark-900/50 border border-dark-700 rounded-lg">
+                                <p className="text-sm text-gray-300">{api}</p>
+                            </div>
+                        ))}
                     </div>
                 )}
             </section>
@@ -256,14 +250,11 @@ export const AIResults: React.FC = () => {
                     </div>
                 ) : (
                     <div className="space-y-3">
-                        <a href="#" className="block p-3 bg-dark-900/50 border border-dark-700 rounded-lg hover:border-primary-500 transition-colors">
-                            <p className="text-primary-400 font-medium text-sm">ultralytics/yolov8</p>
-                            <p className="text-xs text-gray-400">State-of-the-art vision models</p>
-                        </a>
-                        <a href="#" className="block p-3 bg-dark-900/50 border border-dark-700 rounded-lg hover:border-primary-500 transition-colors">
-                            <p className="text-primary-400 font-medium text-sm">farmOS/farmOS</p>
-                            <p className="text-xs text-gray-400">Open source farm management</p>
-                        </a>
+                        {realData?.githubRepositories?.map((repo, i) => (
+                            <div key={i} className="block p-3 bg-dark-900/50 border border-dark-700 rounded-lg">
+                                <p className="text-primary-400 font-medium text-sm">{repo}</p>
+                            </div>
+                        ))}
                     </div>
                 )}
             </section>
@@ -279,7 +270,7 @@ export const AIResults: React.FC = () => {
                     <Skeleton className="h-16 w-full max-w-md" />
                 </div>
             ) : (
-                <Timeline />
+                <Timeline items={realData?.sixWeekImplementationRoadmap} />
             )}
         </section>
 

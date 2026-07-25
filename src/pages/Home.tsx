@@ -52,7 +52,7 @@ export const Home: React.FC = () => {
         
         <h1 className="text-5xl sm:text-7xl lg:text-8xl font-extrabold tracking-tight mb-8 animate-in fade-in slide-in-from-bottom-6 duration-700 delay-150">
           <span className="text-white block mb-2 drop-shadow-sm">
-            Search Less.
+            INSIGHT COPILOT
           </span>
           <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary-400 via-purple-400 to-pink-400 block pb-4 drop-shadow-sm">
             Solve More.
